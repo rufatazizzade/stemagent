@@ -1,0 +1,12 @@
+{
+  "sql_injection.py": ["sql_injection"],
+  "hardcoded_secret.py": ["hardcoded_secret"],
+  "command_injection.py": ["command_injection"],
+  "path_traversal.py": ["path_traversal"],
+  "insecure_eval.py": ["insecure_eval"],
+  "weak_password_hash.py": ["weak_password_hash"],
+  "debug_enabled.py": ["debug_enabled"],
+  "open_redirect.py": ["open_redirect"],
+  "insecure_deserialization.py": ["insecure_deserialization"],
+  "safe_code.py": []
+}

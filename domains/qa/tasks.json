@@ -1,0 +1,7 @@
+{
+  "domain": "qa",
+  "task_type": "test_review",
+  "description": "Analyze code for test coverage gaps, code quality issues, and testing best practices.",
+  "samples_dir": "samples",
+  "tasks": []
+}

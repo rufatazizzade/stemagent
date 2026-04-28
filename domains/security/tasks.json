@@ -1,0 +1,18 @@
+{
+  "domain": "security",
+  "task_type": "code_review",
+  "description": "Analyze Python source files for security vulnerabilities. Identify vulnerability types, provide evidence, and suggest remediations.",
+  "samples_dir": "samples",
+  "tasks": [
+    {"id": "task_001", "file": "sql_injection.py", "instruction": "Review this code for security issues."},
+    {"id": "task_002", "file": "hardcoded_secret.py", "instruction": "Review this code for security issues."},
+    {"id": "task_003", "file": "command_injection.py", "instruction": "Review this code for security issues."},
+    {"id": "task_004", "file": "path_traversal.py", "instruction": "Review this code for security issues."},
+    {"id": "task_005", "file": "insecure_eval.py", "instruction": "Review this code for security issues."},
+    {"id": "task_006", "file": "weak_password_hash.py", "instruction": "Review this code for security issues."},
+    {"id": "task_007", "file": "debug_enabled.py", "instruction": "Review this code for security issues."},
+    {"id": "task_008", "file": "open_redirect.py", "instruction": "Review this code for security issues."},
+    {"id": "task_009", "file": "insecure_deserialization.py", "instruction": "Review this code for security issues."},
+    {"id": "task_010", "file": "safe_code.py", "instruction": "Review this code for security issues."}
+  ]
+}
