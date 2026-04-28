@@ -1,214 +1,156 @@
-# StemForge — Universal Stem Agent Specialization System
+# StemForge: Universal Stem Agent Specialization
 
-> A domain-agnostic framework that transforms a minimal universal agent into a
-> measurably superior specialist through an evaluation-driven self-specialization loop.
+StemForge is a research prototype that demonstrates a structured process for transforming a generic AI agent into a domain specialist. Like a biological stem cell that can differentiate into various cell types, the "stem agent" in this system begins as a minimal, domain-agnostic entity and evolves through a repeatable specialization loop.
 
----
+The project addresses the challenge of building specialized agents by focusing not on hardcoded knowledge, but on the *procedure* of specialization. This allows the same core system to adapt to diverse task families—such as security auditing, quality assurance, or deep research—by following a structured, evaluation-driven evolution cycle.
 
-## Why "Stem Agent"?
+It is important to clarify that the stem agent is universal not because it can directly solve every possible task, but because the specialization process itself is domain-agnostic. The system observes task examples, infers a strategy, builds a specialized configuration, and validates the resulting agent against measurable ground truth.
 
-Like a biological stem cell, the **stem agent** starts as a generic, undifferentiated
-entity.  It doesn't know security, QA, or any specific domain.  Through a repeatable
-specialization procedure — profile, strategize, build, evaluate, accept-or-rollback —
-it differentiates into a domain expert.
+## Core Idea
 
-**The agent is universal not because it directly solves every task**, but because the
-specialization procedure itself is domain-agnostic.
+The fundamental concept of StemForge is the "Universal to Specialist" transition. Instead of building a security agent or a QA agent from scratch, we build a **specialization loop** that can take a minimal "universal" agent and differentiate it for a specific task family.
 
-## Why Security as the Demo Domain?
-
-Security code review was chosen because it allows **measurable evaluation**: we have
-concrete vulnerability labels, a clear ground truth, and well-defined metrics
-(precision, recall, F1).  The same loop can theoretically specialize the agent into
-a QA reviewer, a research analyst, or any other domain.
-
----
+In this context, "universal" refers to the domain-agnostic nature of the specialization machinery. The loop is the same regardless of whether the target is cybersecurity or accessibility testing. The agent "specializes" by acquiring a tailored checklist, analysis approach, and output schema through observation and evaluation.
 
 ## Architecture
 
+```text
+Universal Stem Agent
+        |
+        v
+Domain Profiler
+        |
+        v
+Strategy Generator
+        |
+        v
+Agent Builder
+        |
+        v
+Evaluator
+        |
+        v
+Safeguard / Rollback
+        |
+        v
+Specialist Agent
 ```
-┌──────────────┐      ┌──────────────────┐      ┌─────────────────────┐
-│  Stem Agent  │─────▶│  Domain Profiler  │─────▶│ Strategy Generator  │
-│  (baseline)  │      │  (analyze tasks)  │      │ (build checklist)   │
-└──────────────┘      └──────────────────┘      └─────────┬───────────┘
-                                                          │
-                                                          ▼
-┌──────────────┐      ┌──────────────────┐      ┌─────────────────────┐
-│  Safeguards  │◀─────│    Evaluator     │◀─────│   Agent Builder     │
-│ (accept/rej) │      │ (P / R / F1)     │      │ (specialist config) │
-└──────────────┘      └──────────────────┘      └─────────────────────┘
+
+### Modules
+
+- **Domain Profiler**: Analyzes sample tasks and code to understand the domain's characteristics, required skills, and typical patterns.
+- **Strategy Generator**: Derives a formal analysis strategy, including a specific checklist of items to look for and a structured output schema.
+- **Agent Builder**: Assembles a specialized agent configuration by combining the domain profile and the generated strategy into a detailed system prompt.
+- **Specialist Agent**: An evolved agent instance that operates using the specialized configuration to perform high-precision analysis.
+- **Evaluator**: Measures the agent's performance (Precision, Recall, F1) against labeled ground truth data.
+- **Safeguards**: A gating mechanism that accepts the new specialist only if it demonstrates measurable improvement over the current best version; otherwise, it rolls back changes.
+- **LLM Backend**: A unified abstraction layer supporting both deterministic mock mode and real-world OpenAI models.
+
+## Demo Domain: Security Code Review
+
+Security code review was chosen as the demonstration domain because it provides a clear, measurable benchmark. We use a suite of small Python files, each labeled with specific vulnerability classes (or marked as safe). This allows for unambiguous calculation of precision and recall.
+
+The benchmark targets the following vulnerability types:
+- `sql_injection`
+- `hardcoded_secret`
+- `command_injection`
+- `path_traversal`
+- `insecure_eval`
+- `weak_password_hash`
+- `debug_enabled`
+- `open_redirect`
+- `insecure_deserialization`
+- `safe_code` (contains no vulnerabilities)
+
+## Setup
+
+1. **Clone the repository and enter the directory.**
+2. **Create and activate a virtual environment:**
+   ```bash
+   python -m venv venv
+   ```
+   - **Windows:** `venv\Scripts\activate`
+   - **macOS/Linux:** `source venv/bin/activate`
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Environment
+
+To use real-world models, create a `.env` file in the root directory:
+```text
+OPENAI_API_KEY=your_api_key_here
 ```
+**Note:** No API key is required to run the main benchmark in mock mode. The system will use deterministic pattern matching to simulate the specialization process, ensuring reproducible results for evaluation purposes.
 
-### Specialization Loop
+## Running the Main Benchmark
 
-1. **Baseline** — Run the generic stem agent; measure F1.
-2. **Profile** — Analyze domain tasks and samples.
-3. **Strategize** — Generate a vulnerability checklist and output schema.
-4. **Build** — Create a specialist agent config with a detailed system prompt.
-5. **Evaluate** — Run the specialist; compute precision / recall / F1.
-6. **Safeguard** — Accept only if F1 ≥ baseline; otherwise rollback.
-7. **Iterate** — Repeat with feedback; stop when improvement < 0.03 for 2 rounds.
-
----
-
-## Quick Start
-
-### Prerequisites
-
-- Python 3.10+
-- (Optional) An OpenAI API key
-
-### Setup
-
+To run the full specialization loop using the deterministic MockLLM:
 ```bash
-# Clone or enter the project directory
-cd stemforge
-
-# Create a virtual environment (recommended)
-python -m venv .venv
-.venv\Scripts\activate        # Windows
-# source .venv/bin/activate   # Linux / macOS
-
-# Install dependencies
-pip install -r requirements.txt
-
-# (Optional) Set your OpenAI key
-copy .env.example .env
-# Edit .env and add your OPENAI_API_KEY
-```
-
-### Running — For Reproducible Evaluation (Mock LLM)
-
-```bash
-# Recommended for consistent, deterministic benchmark results
 python run.py --domain security --iterations 3 --mock
 ```
+This command initializes the universal stem agent, profiles the security domain, and runs up to 3 iterations of strategy generation and evaluation. It uses the `--mock` flag to ensure consistent, repeatable results.
 
-The MockLLM uses deterministic pattern matching to simulate the specialization
-improvement, producing identical results on every run.
+## Running with OpenAI
 
-### Running — With Real LLM (OpenAI)
-
+If you have an OpenAI API key configured, you can run the loop with real models:
 ```bash
-# Set your OPENAI_API_KEY in .env first
 python run.py --domain security --iterations 3
 ```
+- The system defaults to `gpt-4o-mini`.
+- Calls include a **30-second timeout** and a **max_retries of 1**.
+- If an OpenAI call fails or times out, the system gracefully falls back to the **MockLLM** to prevent the loop from crashing.
 
----
+## Evaluating Agents
 
-## Evaluation
-
-Evaluate individual agents against a domain benchmark:
-
+You can evaluate individual agents (baseline vs. evolved) against the benchmark:
 ```bash
-# Baseline agent
-python evaluate.py --agent baseline --domain security
+# Evaluate the baseline universal agent
+python evaluate.py --agent baseline --domain security --mock
 
-# Evolved specialist (must run `run.py` first)
-python evaluate.py --agent evolved --domain security
+# Evaluate the evolved specialist (requires run.py to have been executed first)
+python evaluate.py --agent evolved --domain security --mock
 ```
 
-### Metrics
+## Quick Testing
 
-| Metric    | Definition                          |
-|-----------|-------------------------------------|
-| Precision | TP / (TP + FP) — accuracy of alerts |
-| Recall    | TP / (TP + FN) — coverage           |
-| F1        | Harmonic mean of P and R            |
-
----
-
-## Example Output (Mock LLM)
-
-```
-══════════════════════════════════════════════════════════════
-  StemForge: Universal Stem Agent Specialization
-══════════════════════════════════════════════════════════════
-
-  LLM backend : MockLLM (deterministic)
-  Domain      : security
-  Iterations  : 3
-
-[1] Running baseline universal stem agent...
-  Baseline Precision............. 1.0000
-  Baseline Recall................ 0.3333
-  Baseline F1.................... 0.5000
-
-[2] Profiling domain...
-  Detected domain  : security code review
-  Required skills  : code reading, vulnerability taxonomy, ...
-
-[3] Generating specialist strategy (iteration 1/3)...
-  Checklist:
-    - sql_injection
-    - hardcoded_secret
-    - command_injection
-    ...
-
-[4] Building evolved specialist agent v1.0...
-  Saved: agents\evolved_security_agent.json
-
-[5] Evaluating evolved agent...
-  Evolved Precision.............. 1.0000
-  Evolved Recall................. 1.0000
-  Evolved F1..................... 1.0000
-
-[6] Safeguard decision:
-  Accepted evolved agent because F1 improved from 0.5000 to 1.0000
-
-══════════════════════════════════════════════════════════════
-  Final Before / After Comparison
-══════════════════════════════════════════════════════════════
-
-Version                        Precision    Recall        F1
-──────────────────────────────────────────────────────────────
-Baseline universal stem             1.0000    0.3333    0.5000
-Evolved specialist                  1.0000    1.0000    1.0000
-──────────────────────────────────────────────────────────────
-
-  ✓ Specialization improved F1 by 0.5000
+For a fast smoke test of the system logic, use the `--max-files` option to limit the scope:
+```bash
+python run.py --domain security --iterations 1 --mock --max-files 3
 ```
 
----
+## Example Output
 
-## Project Structure
+A successful run demonstrates the measurable gain from a generic baseline to a specialized agent:
 
-```
-stemforge/
-├── README.md               # This file
-├── WRITEUP.md              # Detailed write-up
-├── requirements.txt        # Python dependencies
-├── .env.example            # Example environment config
-├── .gitignore
-├── run.py                  # Main specialization loop
-├── evaluate.py             # Standalone evaluator
-│
-├── stemforge/              # Core library
-│   ├── __init__.py
-│   ├── models.py           # Pydantic data models
-│   ├── llm.py              # LLM abstraction (OpenAI + Mock)
-│   ├── stem_agent.py       # Baseline universal agent
-│   ├── domain_profiler.py  # Domain analysis
-│   ├── strategy_generator.py  # Specialist strategy creation
-│   ├── agent_builder.py    # Agent config assembly
-│   ├── specialist_agent.py # Evolved specialist agent
-│   ├── evaluator.py        # Precision / Recall / F1
-│   └── safeguards.py       # Accept / reject gate
-│
-├── domains/                # Domain benchmarks
-│   ├── security/
-│   │   ├── tasks.json
-│   │   ├── expected.json
-│   │   └── samples/        # 10 sample files
-│   └── qa/                 # Stub for future domains
-│
-└── agents/                 # Generated agent configs
-    ├── baseline_agent.json
-    └── evolved_security_agent.json  (generated)
-```
+| Version | Precision | Recall | F1 |
+| :--- | :--- | :--- | :--- |
+| **Baseline universal stem** | 1.0000 | 0.3333 | 0.5000 |
+| **Evolved specialist** | 1.0000 | 1.0000 | 1.0000 |
 
----
+## Output Files
 
-## License
+- `agents/evolved_security_agent.json`: The generated configuration (system prompt and strategy) for the specialist.
+- `agents/final_results.json`: Detailed metrics and per-file breakdown of the final evaluation.
 
-Research prototype — not intended for production use.
+## Reproducibility Note
+
+The reported benchmark results are based on the deterministic **MockLLM** mode. This ensures that the effectiveness of the specialization loop's *logic* is verified independently of LLM non-determinism or API latency.
+
+## Limitations
+
+- **Small Benchmark**: The demo uses a controlled suite of 10 sample files with clear-cut vulnerabilities.
+- **Toy Examples**: Vulnerabilities are represented as simple patterns for demonstration purposes.
+- **Configuration-based**: The agent "evolves" by generating a new system prompt and strategy, not by autonomously rewriting its own source code.
+- **LLM Variance**: While the mock mode is deterministic, real-world OpenAI results may vary slightly between runs.
+- **Research Prototype**: The goal is to demonstrate the *specialization loop*, not to build a production-grade security scanner.
+
+## Future Work
+
+- **Larger Benchmarks**: Integration with more complex, real-world codebases.
+- **Real Tool Integration**: Incorporating static analysis tools like Semgrep or Bandit into the agent's toolkit.
+- **Multi-Domain Support**: Expanding beyond security to QA, performance auditing, and deep technical research.
+- **Robust Versioning**: Implementing stronger rollback mechanisms and configuration versioning.
+- **Autonomous Tool Acquisition**: Allowing the agent to plan, install, and configure its own analysis tools.
+- **Cross-Domain Specialization**: Testing how knowledge from one domain can accelerate specialization in another.

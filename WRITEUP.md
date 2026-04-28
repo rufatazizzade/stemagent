@@ -212,9 +212,3 @@ The safeguard gate accepted the evolved agent in every run.
 
 7. **Multi-agent composition** — Compose specialists from different domains
    into a pipeline (e.g., security → QA → performance).
-
----
-
-*StemForge is a research prototype demonstrating evaluation-driven agent
-specialization.  The core contribution is the loop, not any individual
-component.*
