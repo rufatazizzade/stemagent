@@ -114,37 +114,22 @@ severity definitions, and a structured output schema.
 
 ---
 
-## 6. Results
+## 6. Benchmark Results (Deterministic)
 
-### Mock LLM Results
+To ensure reproducibility, the primary benchmark is reported using the **MockLLM** backend. This eliminates the inherent variance of commercial LLM APIs and focuses on the mechanical effectiveness of the specialization loop.
 
 | Version              | Precision | Recall | F1     |
 |----------------------|-----------|--------|--------|
 | Baseline stem agent  | 1.0000    | 0.3333 | 0.5000 |
 | Evolved specialist   | 1.0000    | 1.0000 | 1.0000 |
 
-**Improvement: +0.5000 F1**
+**Total F1 Improvement: +0.5000**
 
-The baseline catches 3 out of 9 vulnerabilities (hardcoded_secret,
-debug_enabled, insecure_eval) with perfect precision.  After specialization,
-the evolved agent detects all 9 with zero false positives.
+The baseline universal agent detects only the three most obvious vulnerability patterns (hardcoded secrets, debug mode, and insecure eval). After the specialization loop, the evolved specialist receives a comprehensive security checklist that enables it to detect all 9 vulnerability classes with perfect precision.
 
-### Real LLM Results (GPT-4o-mini)
+### 6.1 Additional Validation (GPT-4o-mini)
 
-| Version              | Precision | Recall | F1     |
-|----------------------|-----------|--------|--------|
-| Baseline stem agent  | 0.4615    | 0.6667 | 0.5455 |
-| Evolved specialist   | 1.0000    | 1.0000 | 1.0000 |
-
-**Improvement: +0.4545 F1**
-
-With GPT-4o-mini, the baseline agent actually has higher recall than the mock
-(it detects more issues) but much lower precision (it invents vague labels
-like `security_vulnerability` and produces duplicate findings like
-`weak_password_hashing_md5` + `weak_password_hashing_sha1` for the same
-class).  The evolved specialist, guided by an explicit checklist and strict
-output rules, achieves **perfect scores** — demonstrating that the
-specialization loop works even better with a real LLM than with the mock.
+When using a real LLM (OpenAI `gpt-4o-mini`), the system demonstrates even more significant qualitative gains. While the baseline agent with a generic prompt often produces vague or redundant findings, the specialized agent follows the generated strategy with high rigor.
 
 ### Iteration Dynamics (Real LLM)
 

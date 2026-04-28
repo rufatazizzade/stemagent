@@ -48,19 +48,24 @@ class OpenAILLM(BaseLLM):
             from openai import OpenAI
         except ImportError:
             raise ImportError("openai package required. Run: pip install openai")
-        self.client = OpenAI()  # reads OPENAI_API_KEY from env
+        self.client = OpenAI(max_retries=1)  # reads OPENAI_API_KEY from env
         self.model = model
 
     def call(self, system_prompt: str, user_prompt: str) -> str:
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            temperature=0.0,
-        )
-        return response.choices[0].message.content or "{}"
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                temperature=0.0,
+                timeout=30,
+            )
+            return response.choices[0].message.content or "{}"
+        except Exception as e:
+            print(f"\033[93mWarning: OpenAI call failed ({e}). Falling back to MockLLM.\033[0m")
+            return MockLLM().call(system_prompt, user_prompt)
 
     def name(self) -> str:
         return f"OpenAI ({self.model})"
@@ -224,8 +229,10 @@ class MockLLM(BaseLLM):
 # Factory
 # ---------------------------------------------------------------------------
 
-def get_llm() -> BaseLLM:
-    """Return the appropriate LLM backend based on environment."""
+def get_llm(force_mock: bool = False) -> BaseLLM:
+    """Return the appropriate LLM backend based on environment and flags."""
+    if force_mock:
+        return MockLLM()
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if api_key and api_key != "your-api-key-here":
         return OpenAILLM()

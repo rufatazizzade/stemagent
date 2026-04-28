@@ -21,7 +21,7 @@ class Evaluator:
         with open(expected_path, "r", encoding="utf-8") as f:
             self.expected: Dict[str, List[str]] = json.load(f)
 
-    def analyze_and_evaluate(self, agent: any, samples_dir: Path) -> EvaluationResult:
+    def analyze_and_evaluate(self, agent: any, samples_dir: Path, max_files: int | None = None) -> EvaluationResult:
         """Run analysis and evaluation in one step for consistency.
 
         Parameters
@@ -30,12 +30,14 @@ class Evaluator:
             The agent to use for analysis.
         samples_dir : Path
             Directory containing sample files.
+        max_files : int, optional
+            Limit the number of files analyzed.
 
         Returns
         -------
         EvaluationResult
         """
-        findings = agent.analyze_directory(samples_dir)
+        findings = agent.analyze_directory(samples_dir, max_files=max_files)
         return self.evaluate(findings)
 
     def evaluate(self, all_findings: Dict[str, List[Finding]]) -> EvaluationResult:

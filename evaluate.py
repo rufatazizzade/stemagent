@@ -57,6 +57,17 @@ def main() -> None:
         default="security",
         help="Domain benchmark (default: security)",
     )
+    parser.add_argument(
+        "--mock",
+        action="store_true",
+        help="Force use of MockLLM even if API key exists",
+    )
+    parser.add_argument(
+        "--max-files",
+        type=int,
+        default=None,
+        help="Limit number of files analyzed",
+    )
     args = parser.parse_args()
 
     project_root = Path(__file__).resolve().parent
@@ -68,7 +79,7 @@ def main() -> None:
         print(f"{RED}Error: Domain directory not found: {domain_dir}{RESET}")
         sys.exit(1)
 
-    llm = get_llm()
+    llm = get_llm(force_mock=args.mock)
 
     print(f"\n{BOLD}{CYAN}StemForge Evaluator{RESET}")
     print(f"  Agent   : {args.agent}")
@@ -87,7 +98,7 @@ def main() -> None:
             sys.exit(1)
         agent = SpecialistAgent.from_file(llm, config_path)
 
-    result = evaluator.analyze_and_evaluate(agent, samples_dir)
+    result = evaluator.analyze_and_evaluate(agent, samples_dir, max_files=args.max_files)
 
     # Print results
     print(f"{BOLD}{'Metric':<20s} {'Value':>10s}{RESET}")

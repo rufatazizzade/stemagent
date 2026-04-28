@@ -56,8 +56,8 @@ class StemAgent:
         raw = self.llm.call(self.config.system_prompt, user_prompt)
         return self._parse_findings(raw, filepath.name)
 
-    def analyze_directory(self, directory: Path) -> Dict[str, List[Finding]]:
-        """Analyze all Python files in a directory.
+    def analyze_directory(self, directory: Path, max_files: int | None = None) -> Dict[str, List[Finding]]:
+        """Analyze Python files in a directory.
 
         Returns
         -------
@@ -65,7 +65,10 @@ class StemAgent:
             Mapping of ``filename -> list[Finding]``.
         """
         results: Dict[str, List[Finding]] = {}
-        for path in sorted(directory.glob("*.py")):
+        files = sorted(directory.glob("*.py"))
+        if max_files:
+            files = files[:max_files]
+        for path in files:
             results[path.name] = self.analyze_file(path)
         return results
 

@@ -107,6 +107,17 @@ def main() -> None:
         default=3,
         help="Maximum specialization iterations (default: 3)",
     )
+    parser.add_argument(
+        "--mock",
+        action="store_true",
+        help="Force use of MockLLM even if API key exists",
+    )
+    parser.add_argument(
+        "--max-files",
+        type=int,
+        default=None,
+        help="Limit number of files analyzed per evaluation",
+    )
     args = parser.parse_args()
 
     # Resolve paths
@@ -121,7 +132,7 @@ def main() -> None:
         sys.exit(1)
 
     # Initialize components
-    llm = get_llm()
+    llm = get_llm(force_mock=args.mock)
 
     header("StemForge: Universal Stem Agent Specialization")
     print(f"  LLM backend : {llm.name()}")
@@ -133,7 +144,7 @@ def main() -> None:
 
     stem = StemAgent(llm)
     evaluator = Evaluator(expected_path)
-    baseline_result = evaluator.analyze_and_evaluate(stem, samples_dir)
+    baseline_result = evaluator.analyze_and_evaluate(stem, samples_dir, max_files=args.max_files)
 
     metric("Baseline Precision", baseline_result.precision)
     metric("Baseline Recall", baseline_result.recall)
@@ -183,7 +194,7 @@ def main() -> None:
         step(5, "Evaluating evolved agent...")
 
         specialist = SpecialistAgent(llm, config)
-        evolved_result = evaluator.analyze_and_evaluate(specialist, samples_dir)
+        evolved_result = evaluator.analyze_and_evaluate(specialist, samples_dir, max_files=args.max_files)
 
         metric("Evolved Precision", evolved_result.precision)
         metric("Evolved Recall", evolved_result.recall)

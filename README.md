@@ -77,21 +77,22 @@ copy .env.example .env
 # Edit .env and add your OPENAI_API_KEY
 ```
 
-### Running — With API Key
+### Running — For Reproducible Evaluation (Mock LLM)
 
 ```bash
-python run.py --domain security --iterations 3
-```
-
-### Running — Without API Key (Mock LLM)
-
-```bash
-# Just run it — MockLLM activates automatically when no key is set
-python run.py --domain security --iterations 3
+# Recommended for consistent, deterministic benchmark results
+python run.py --domain security --iterations 3 --mock
 ```
 
 The MockLLM uses deterministic pattern matching to simulate the specialization
 improvement, producing identical results on every run.
+
+### Running — With Real LLM (OpenAI)
+
+```bash
+# Set your OPENAI_API_KEY in .env first
+python run.py --domain security --iterations 3
+```
 
 ---
 
