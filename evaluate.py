@@ -75,10 +75,10 @@ def main() -> None:
     print(f"  Domain  : {args.domain}")
     print(f"  LLM     : {llm.name()}\n")
 
-    # Run the appropriate agent
+    # Run and Evaluate
+    evaluator = Evaluator(expected_path)
     if args.agent == "baseline":
         agent = StemAgent(llm)
-        findings = agent.analyze_directory(samples_dir)
     else:
         config_path = project_root / "agents" / f"evolved_{args.domain}_agent.json"
         if not config_path.exists():
@@ -86,11 +86,8 @@ def main() -> None:
             print(f"Run 'python run.py --domain {args.domain}' first.{RESET}")
             sys.exit(1)
         agent = SpecialistAgent.from_file(llm, config_path)
-        findings = agent.analyze_directory(samples_dir)
 
-    # Evaluate
-    evaluator = Evaluator(expected_path)
-    result = evaluator.evaluate(findings)
+    result = evaluator.analyze_and_evaluate(agent, samples_dir)
 
     # Print results
     print(f"{BOLD}{'Metric':<20s} {'Value':>10s}{RESET}")

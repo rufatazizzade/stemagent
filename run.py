@@ -132,9 +132,8 @@ def main() -> None:
     step(1, "Running baseline universal stem agent...")
 
     stem = StemAgent(llm)
-    baseline_findings = stem.analyze_directory(samples_dir)
     evaluator = Evaluator(expected_path)
-    baseline_result = evaluator.evaluate(baseline_findings)
+    baseline_result = evaluator.analyze_and_evaluate(stem, samples_dir)
 
     metric("Baseline Precision", baseline_result.precision)
     metric("Baseline Recall", baseline_result.recall)
@@ -184,8 +183,7 @@ def main() -> None:
         step(5, "Evaluating evolved agent...")
 
         specialist = SpecialistAgent(llm, config)
-        evolved_findings = specialist.analyze_directory(samples_dir)
-        evolved_result = evaluator.evaluate(evolved_findings)
+        evolved_result = evaluator.analyze_and_evaluate(specialist, samples_dir)
 
         metric("Evolved Precision", evolved_result.precision)
         metric("Evolved Recall", evolved_result.recall)

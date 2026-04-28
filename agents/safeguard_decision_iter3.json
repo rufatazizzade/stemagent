@@ -1,7 +1,7 @@
 {
   "accepted": true,
-  "reason": "Accepted evolved agent because F1 improved from 0.8889 to 1.0000 (+0.1111).",
-  "baseline_f1": 0.8889,
+  "reason": "Accepted evolved agent because F1 improved from 0.9474 to 1.0000 (+0.0526).",
+  "baseline_f1": 0.9474,
   "evolved_f1": 1.0,
-  "improvement": 0.1111
+  "improvement": 0.0526
 }

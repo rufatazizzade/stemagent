@@ -17,8 +17,26 @@ class Evaluator:
     """Compares agent output to ground-truth expected labels."""
 
     def __init__(self, expected_path: Path):
+        self.expected_path = expected_path
         with open(expected_path, "r", encoding="utf-8") as f:
             self.expected: Dict[str, List[str]] = json.load(f)
+
+    def analyze_and_evaluate(self, agent: any, samples_dir: Path) -> EvaluationResult:
+        """Run analysis and evaluation in one step for consistency.
+
+        Parameters
+        ----------
+        agent : StemAgent or SpecialistAgent
+            The agent to use for analysis.
+        samples_dir : Path
+            Directory containing sample files.
+
+        Returns
+        -------
+        EvaluationResult
+        """
+        findings = agent.analyze_directory(samples_dir)
+        return self.evaluate(findings)
 
     def evaluate(self, all_findings: Dict[str, List[Finding]]) -> EvaluationResult:
         """Compute precision / recall / F1 over the full benchmark.

@@ -20,16 +20,10 @@ class StemAgent:
     """Minimal universal agent — no domain-specific instructions."""
 
     DEFAULT_SYSTEM_PROMPT = (
-        "You are a universal analysis agent. "
-        "Analyze the given task and produce useful findings. "
+        "Analyze this task and return only the most obvious issues. "
+        "Do not use any domain-specific checklist. "
         "Return your response as a JSON object with a 'findings' array. "
-        "Each finding must have these keys: "
-        "type (snake_case label for the issue type), "
-        "severity (low/medium/high/critical), "
-        "file (the filename), "
-        "evidence (the relevant code line), "
-        "fix (a suggested remediation). "
-        "Use specific, descriptive snake_case labels for the 'type' field. "
+        "Each finding must have these keys: type, severity, file, evidence, fix. "
         "If no issues are found, return {\"findings\": []}."
     )
 
